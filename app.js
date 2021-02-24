@@ -65,6 +65,12 @@ class UI {
 
     static editBook(event) {
         if (event.classList.contains('edit')) {
+
+            //* Removing Add Event
+            document.querySelector('#book-form').removeEventListener('submit', addEvent)
+
+
+
             //* Getting Previous Values
             const titleVal = event.parentElement.parentElement.firstElementChild.innerHTML;
             const authorVal = event.parentElement.parentElement.firstElementChild.nextElementSibling.innerHTML;
@@ -76,12 +82,25 @@ class UI {
             document.querySelector('#isbn').value = isbnVal
             document.querySelector('.btn').value = 'Update Book'
 
+            const editBook  = {
+                title: titleVal,
+                author: authorVal,
+                isbn: isbnVal
+            }
+
+            Store.removeBook(editBook.isbn)
+
             //* Updating the New values
             document.querySelector('#book-form').addEventListener('submit', e => {
                 e.preventDefault();
                 const title = document.querySelector('#title').value;
                 const author = document.querySelector('#author').value;
                 const isbn = document.querySelector('#isbn').value;
+
+                editBook.title = title;
+                editBook.author = author;
+                editBook.isbn = isbn;
+                    
 
                 //* Validate Forms
                 if (title === '' || author === '' || isbn === '') {
@@ -96,13 +115,17 @@ class UI {
                     <td><a href="#" class="btn btn-danger delete">X</a></td>
                     `;
 
+                    //* Edit to Store
+                    
+                    Store.editBook(editBook)
+
                     //* Show Success message
                     UI.showAlert('Book Details Updated', 'info')
 
                     //* Clear UI FORM FIELDS
                     UI.clearFields();
 
-                    console.log(book);
+                    document.querySelector('.btn').value = 'Add Book'
                 }
 
             })
@@ -137,6 +160,13 @@ class Store {
         localStorage.setItem('books', JSON.stringify(books))
     }
 
+    static editBook(book) {
+        const books = Store.getBooks();
+        books.unshift(book);
+
+        localStorage.setItem('books', JSON.stringify(books))
+    }
+
     static removeBook(isbn) {
         const books = Store.getBooks();
         console.log(isbn);
@@ -150,12 +180,8 @@ class Store {
     }
 }
 
-
-//* Event: Display Books
-window.addEventListener('DOMContentLoaded', UI.displayBooks);
-
-//* Event: Add Book
-document.querySelector('#book-form').addEventListener('submit', e => {
+//* Functions Decalartions for using in EVENT LISTENERS
+const addEvent = (e) => {
     e.preventDefault();
     const title = document.querySelector('#title').value;
     const author = document.querySelector('#author').value;
@@ -184,12 +210,19 @@ document.querySelector('#book-form').addEventListener('submit', e => {
         console.log(book);
     }
 
-})
+}
 
-// //* Edit Book Details
-// document.querySelector('#book-list').addEventListener('click', e => {
-//     UI.editBook(e.target);
-// });
+//* Event: Display Books
+window.addEventListener('DOMContentLoaded', UI.displayBooks);
+
+//* Event: Add Book
+document.querySelector('#book-form').addEventListener('submit', addEvent)
+
+//* Edit Book Details
+document.querySelector('#book-list').addEventListener('click', e => {
+    UI.editBook(e.target);
+    
+});
 
 //* Event: Delete Book
 document.querySelector('#book-list').addEventListener('click', e => {
