@@ -15,6 +15,26 @@
 </head>
 
 <body>
+    <!-- ***CONFIRMATION MODAL**** -->
+    <div class="modal-wrapper" id="modal-wrapper">
+        <div class="modal-details">
+            <span class="close">X</span>
+            <p>Are you sure you want to Delete All?</p>
+            <button class="btn btn-info cancel" onclick="hideModal()">Cancel</button>
+            <button class="btn btn-danger" id="delete-btn">Delete All</button>
+        </div>
+    </div>
+
+    <div class="modal-wrapper" id="modal-wrapper-2">
+        <div class="modal-details">
+            <span class="close">X</span>
+            <p>Are you sure you want to Delete?</p>
+            <button class="btn btn-info cancel" onclick="hideModal()">Cancel</button>
+            <button class="btn btn-danger" id="delete-single-btn">Delete</button>
+        </div>
+    </div>
+
+
     <div class="container mt-4">
         <h1 class="display-4 text-center">
             <i class="fa fa-book" aria-hidden="true"></i> My<span class="text-primary">Book</span>List</h1>
@@ -33,6 +53,7 @@
             </div>
             <input type="submit" value="Add Book" class="btn btn-primary btn-block">
         </form>
+        <button class="btn btn-block btn-warning" onclick="displayModal1()">Delete All Books</button>
         <table class="table table-striped mt-5">
             <thead>
                 <tr>

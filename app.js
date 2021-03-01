@@ -2,6 +2,48 @@
  * This is demo for Js Doc
  */
 
+const editBook = {
+    title: '',
+    author: '',
+    isbn: ''
+}
+
+const modalBox = document.getElementById('modal-wrapper');
+const modalBox2 = document.getElementById('modal-wrapper-2');
+
+
+
+const displayModal1 = () => {
+    modalBox.style.display = 'block';
+}
+
+const displayModal2 = () => {
+    modalBox2.style.display = 'block';
+
+}
+
+const hideModal = () => {
+    modalBox.style.display = 'none';
+    modalBox2.style.display = 'none';
+}
+
+document.querySelector('.cancel').addEventListener('click', () => {
+    hideModal();
+})
+
+document.querySelector('.close').addEventListener('click', () => {
+    hideModal();
+})
+
+
+// console.log(document.querySelector('#deleteBtn'));
+document.getElementById('delete-btn').addEventListener('click', () => {
+    console.log('Clicked');
+})
+
+
+
+
 //* Book Class: Represents a Book
 class Books {
     constructor(title, author, isbn) {
@@ -69,12 +111,14 @@ class UI {
             //* Removing Add Event
             document.querySelector('#book-form').removeEventListener('submit', addEvent)
 
-
-
             //* Getting Previous Values
             const titleVal = event.parentElement.parentElement.firstElementChild.innerHTML;
             const authorVal = event.parentElement.parentElement.firstElementChild.nextElementSibling.innerHTML;
             const isbnVal = event.parentElement.parentElement.firstElementChild.nextElementSibling.nextElementSibling.innerHTML;
+
+            editBook.title = titleVal
+            editBook.author = authorVal
+            editBook.isbn = isbnVal
 
             //* Setting Value to the Form 
             document.querySelector('#title').value = titleVal
@@ -82,17 +126,12 @@ class UI {
             document.querySelector('#isbn').value = isbnVal
             document.querySelector('.btn').value = 'Update Book'
 
-            const editBook  = {
-                title: titleVal,
-                author: authorVal,
-                isbn: isbnVal
-            }
-
+            //* Removing Previous matched Editing data
             Store.removeBook(editBook.isbn)
 
-            //* Updating the New values
-            document.querySelector('#book-form').addEventListener('submit', e => {
+            const editData = e => {
                 e.preventDefault();
+
                 const title = document.querySelector('#title').value;
                 const author = document.querySelector('#author').value;
                 const isbn = document.querySelector('#isbn').value;
@@ -100,7 +139,7 @@ class UI {
                 editBook.title = title;
                 editBook.author = author;
                 editBook.isbn = isbn;
-                    
+
 
                 //* Validate Forms
                 if (title === '' || author === '' || isbn === '') {
@@ -116,7 +155,7 @@ class UI {
                     `;
 
                     //* Edit to Store
-                    
+
                     Store.editBook(editBook)
 
                     //* Show Success message
@@ -126,18 +165,38 @@ class UI {
                     UI.clearFields();
 
                     document.querySelector('.btn').value = 'Add Book'
+
                 }
 
-            })
+            }
+
+            //* Updating the New values
+            document.querySelector('#book-form').addEventListener('submit', editData)
             console.log('Edit Button Clicked', event.parentElement.parentElement.innerHTML);
+
         }
     }
 
     static deleteBook(event) {
         if (event.classList.contains('delete')) {
-            event.parentElement.parentElement.remove();
-            UI.showAlert('Book Deleted', 'warning')
+            displayModal2();
+            document.getElementById('delete-single-btn').addEventListener('click', () => {
+                event.parentElement.parentElement.remove();
+                UI.showAlert('Book Deleted', 'warning')
+                hideModal();
+            })
+
         }
+    }
+
+    static deleteAllBooks() {
+        const list = document.getElementById('book-list');
+
+        const row = document.createElement('tr');
+        // console.log(book);
+        list.innerHTML = '';
+        modalBox.style.display = 'none'
+        console.log('UI Cleared');
     }
 }
 
@@ -178,10 +237,16 @@ class Store {
 
         localStorage.setItem('books', JSON.stringify(books));
     }
+
+    static removeAllBooks() {
+        console.log('local storage cleared')
+        localStorage.clear();
+    }
 }
 
 //* Functions Decalartions for using in EVENT LISTENERS
 const addEvent = (e) => {
+    // document.querySelector('#book-list').removeEventListener('click', editBookData);
     e.preventDefault();
     const title = document.querySelector('#title').value;
     const author = document.querySelector('#author').value;
@@ -212,6 +277,10 @@ const addEvent = (e) => {
 
 }
 
+const editBookData = e => {
+    UI.editBook(e.target);
+}
+
 //* Event: Display Books
 window.addEventListener('DOMContentLoaded', UI.displayBooks);
 
@@ -219,10 +288,8 @@ window.addEventListener('DOMContentLoaded', UI.displayBooks);
 document.querySelector('#book-form').addEventListener('submit', addEvent)
 
 //* Edit Book Details
-document.querySelector('#book-list').addEventListener('click', e => {
-    UI.editBook(e.target);
-    
-});
+document.querySelector('#book-list').addEventListener('click', editBookData);
+document.querySelector('.btn').replaceWith(document.querySelector('.btn').cloneNode(true));
 
 //* Event: Delete Book
 document.querySelector('#book-list').addEventListener('click', e => {
@@ -232,4 +299,11 @@ document.querySelector('#book-list').addEventListener('click', e => {
 
     //* Remove Book from Store
     Store.removeBook(e.target.parentElement.previousElementSibling.previousElementSibling.textContent);
+})
+
+//** Delete All Book */
+document.getElementById('delete-btn').addEventListener('click', () => {
+    UI.deleteAllBooks();
+
+    Store.removeAllBooks();
 })
