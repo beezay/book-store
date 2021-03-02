@@ -79,7 +79,7 @@ class UI {
             <td>${book.author}</td>
             <td>${book.isbn}</td>
             <td><a href="#" class="btn btn-info edit">Edit</a></td>
-            <td><a href="#" class="btn btn-danger delete">X</a></td>
+            <td><a href="#" class="btn btn-danger delete" aria-label="${book.isbn}">X</a></td>
             `;
 
         list.append(row);
@@ -298,7 +298,7 @@ document.querySelector('#book-list').addEventListener('click', e => {
     UI.deleteBook(e.target);
 
     //* Remove Book from Store
-    Store.removeBook(e.target.parentElement.previousElementSibling.previousElementSibling.textContent);
+    Store.removeBook(e.target.ariaLabel);
 })
 
 //** Delete All Book */
